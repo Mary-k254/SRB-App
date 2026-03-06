@@ -1,6 +1,6 @@
 # Smart Booking Software for Public Transport
 
-A modern, full-stack MVP mimicking the Bolt app experience for public transport in Kenya.
+A modern, full-stack MVP for public transport in Kenya.
 
 ## Features
 
