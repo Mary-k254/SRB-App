@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // PASSENGER, DRIVER, MANAGER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings       Booking[] @relation("PassengerBookings")
+  tripsAsDriver  Trip[]    @relation("DriverTrips")
+  comments       Comment[]
+  managedSacco   Sacco?    @relation("SaccoManager")
+}
+
+model Sacco {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  managerId String   @unique
+  manager   User     @relation("SaccoManager", fields: [managerId], references: [id])
+  vehicles  Vehicle[]
+  createdAt DateTime @default(now())
+}
+
+model Vehicle {
+  id            String   @id @default(uuid())
+  plateNumber   String   @unique
+  saccoId       String
+  sacco         Sacco    @relation(fields: [saccoId], references: [id])
+  currentLat    Float?
+  currentLng    Float?
+  isOnline      Boolean  @default(false)
+  trips         Trip[]
+  createdAt     DateTime @default(now())
+}
+
+model Route {
+  id          String   @id @default(uuid())
+  name        String
+  startPoint  String
+  endPoint    String
+  distanceKm  Float
+  baseFare    Float
+  trips       Trip[]
+  createdAt   DateTime @default(now())
+}
+
+model Trip {
+  id          String    @id @default(uuid())
+  vehicleId   String
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id])
+  driverId    String
+  driver      User      @relation("DriverTrips", fields: [driverId], references: [id])
+  routeId     String
+  route       Route     @relation(fields: [routeId], references: [id])
+  startTime   DateTime  @default(now())
+  endTime     DateTime?
+  status      String    @default("ACTIVE")
+  bookings    Booking[]
+}
+
+model Booking {
+  id              String   @id @default(uuid())
+  passengerId     String
+  passenger       User     @relation("PassengerBookings", fields: [passengerId], references: [id])
+  tripId          String
+  trip            Trip     @relation(fields: [tripId], references: [id])
+  pickupLat       Float
+  pickupLng       Float
+  dropoffLat      Float
+  dropoffLng      Float
+  distanceTravelled Float?
+  farePaid        Float?
+  status          String   @default("BOOKED")
+  createdAt       DateTime @default(now())
+}
+
+model Comment {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  content     String
+  rating      Int      @default(5)
+  targetType  String   
+  targetId    String?
+  createdAt   DateTime @default(now())
+}

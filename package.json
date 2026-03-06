@@ -1,0 +1,13 @@
+{
+  "name": "smart-booking-app",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd .. && rm -rf public && mkdir public && cp -r frontend/dist/* public/",
+    "postinstall": "cd backend && npm install && npx prisma generate"
+  }
+}
